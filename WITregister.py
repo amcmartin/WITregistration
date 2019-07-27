@@ -1,10 +1,10 @@
 from configparser import ConfigParser
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import smtplib
 
 parser = ConfigParser()
 parser.read("config.ini")
-print(parser.sections())
 user = parser.get('auth', 'user')
 pas = parser.get('auth', 'pas')
 browser = webdriver.Chrome('C:\webdrivers\chromedriver')
@@ -70,17 +70,40 @@ def backup_check():
     if not runs your back up schedule from the config
     :return:
     '''
-    error1 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[2]/td[1]').text
-    #error2 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[3]/td[1]').text
-    #error3 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[4]/td[1]').text
-    #error4 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[5]/td[1]').text
-    #error5 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[6]/td[1]').text
-    #error6 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[7]/td[1]').text
-    if 'ERROR' in error1: #or 'ERROR' in error2:
-        print('True')
-        submit_class('backup')
-    else:
+    try:
+        error1 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[2]/td[1]').text
+        #error2 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[3]/td[1]').text
+        #error3 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[4]/td[1]').text
+        #error4 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[5]/td[1]').text
+        #error5 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[6]/td[1]').text
+        #error6 = browser.find_element_by_xpath('/html/body/div[3]/form/table[4]/tbody/tr[7]/td[1]').text
+        if 'ERROR' in error1: #or 'ERROR' in error2:
+            print('True')
+            submit_class('backup')
+            send_email(parser.get('email', 'message_bad'), parser.get('email', 'subject'), parser.get('email', 'sendto'))
+
+        else:
+            send_email(parser.get('email', 'message_good'), parser.get('email', 'subject'), parser.get('email', 'sendto'))
+            browser.quit()
+    except:
         browser.quit()
+
+def send_email(subject, message, sendto):
+        Email = "ajs.python"
+        password = "Wentworth2022"
+        try:
+            server = smtplib.SMTP('smtp.gmail.com:587')
+            server.ehlo()
+            server.starttls()
+            server.login(Email, password)
+            msg = 'Subject: {}\n\n{}'.format(subject, message)
+            server.sendmail(Email, sendto, msg)
+            server.quit()
+            print('message sent!')
+        except:
+            print('message failed to send')
+
+
 sign_in(user,pas)
 register()
 submit_class('main')
