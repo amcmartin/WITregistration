@@ -7,7 +7,7 @@ parser = ConfigParser()
 parser.read("config.ini")
 user = parser.get('auth', 'user')
 pas = parser.get('auth', 'pas')
-browser = webdriver.Chrome('C:\webdrivers\chromedriver')
+browser = webdriver.Chrome(parser.get('auth', 'drivepath'))
 
 def sign_in (user,pas):
     '''
