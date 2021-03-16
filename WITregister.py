@@ -17,7 +17,7 @@ def sign_in (user,pas):
     This signs into Leopard Web using user name and password provided in the config
     '''
 
-    url = 'https://cas.wit.edu/cas/login?service=https%3A%2F%2Fprodweb2.wit.edu%3A443%2Fssomanager%2Fc%2FSSB'
+    url = 'https://cas.wit.edu/cas/login?service=https%3A%2F%2Fselfservice.wit.edu%3A443%2Fssomanager%2Fc%2FSSB'
     browser.get(url)
     username = browser.find_element_by_id('username')
     password = browser.find_element_by_id('password')
