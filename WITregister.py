@@ -1,7 +1,9 @@
 from configparser import ConfigParser
+from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import smtplib
+import time
 
 parser = ConfigParser()
 parser.read("config.ini")
@@ -33,14 +35,15 @@ def register():
     only works when the registration period is open
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     '''
-    search = browser.find_element_by_xpath('//*[@id="keyword_in_id"]')
-    search.send_keys('registration')
-    search.send_keys(Keys.ENTER)
-    selectTerm = browser.find_element_by_xpath('/html/body/div[3]/table[1]/tbody/tr[1]/td[2]/a')
-    selectTerm.click()
+    browser.get('https://selfservice.wit.edu/SSBPROD/bwskfreg.P_AddDropCrse')
+    # search = browser.find_element_by_xpath('//*[@id="keyword_in_id"]')
+    # search.send_keys('registration')
+    # search.send_keys(Keys.ENTER)
+    # selectTerm = browser.find_element_by_xpath('/html/body/div[3]/table[1]/tbody/tr[1]/td[2]/a')
+    # selectTerm.click()
     browser.find_element_by_xpath('/html/body/div[3]/form/input').click()#click submit
-    #clicks add or drop
-    browser.find_element_by_xpath('/html/body/div[5]/span/map/p[2]/a[2]').click()
+    # #clicks add or drop
+    # browser.find_element_by_xpath('/html/body/div[5]/span/map/p[2]/a[2]').click()
 
 
 def submit_class(schedule):
@@ -57,10 +60,13 @@ def submit_class(schedule):
     browser.find_element_by_xpath('//*[@id="crn_id4"]').send_keys(parser.get(schedule, 'class4'))
     browser.find_element_by_xpath('//*[@id="crn_id5"]').send_keys(parser.get(schedule, 'class5'))
     browser.find_element_by_xpath('//*[@id="crn_id6"]').send_keys(parser.get(schedule, 'class6'))
+    browser.find_element_by_xpath('//*[@id="crn_id7"]').send_keys(parser.get(schedule, 'class7'))
+    browser.find_element_by_xpath('//*[@id="crn_id8"]').send_keys(parser.get(schedule, 'class8'))
+    browser.find_element_by_xpath('//*[@id="crn_id9"]').send_keys(parser.get(schedule, 'class9'))
+    browser.find_element_by_xpath('//*[@id="crn_id10"]').send_keys(parser.get(schedule, 'class10'))
 
     #clicks submit
     browser.find_element_by_xpath('/html/body/div[3]/form/input[19]').click()  # clicks submit
-
 
 
 def backup_check():
@@ -80,31 +86,24 @@ def backup_check():
         if 'ERROR' in error1: #or 'ERROR' in error2:
             print('True')
             submit_class('backup')
-            send_email(parser.get('email', 'message_bad'), parser.get('email', 'subject'), parser.get('email', 'sendto'))
 
         else:
-            send_email(parser.get('email', 'message_good'), parser.get('email', 'subject'), parser.get('email', 'sendto'))
             browser.quit()
     except:
         browser.quit()
 
-def send_email(subject, message, sendto):
-        Email = "ajs.python"
-        password = "Wentworth2022"
-        try:
-            server = smtplib.SMTP('smtp.gmail.com:587')
-            server.ehlo()
-            server.starttls()
-            server.login(Email, password)
-            msg = 'Subject: {}\n\n{}'.format(subject, message)
-            server.sendmail(Email, sendto, msg)
-            server.quit()
-            print('message sent!')
-        except:
-            print('message failed to send')
 
 
+
+
+start = time.time()
 sign_in(user,pas)
 register()
-submit_class('main')
+try:
+    submit_class('main')
+except NoSuchElementException:
+    print('not open')
 backup_check()
+print(f'time %fs'%(time.time()-start))
+
+#3.933089
