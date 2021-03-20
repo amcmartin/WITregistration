@@ -2,7 +2,6 @@ from configparser import ConfigParser
 from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import smtplib
 import time
 
 parser = ConfigParser()
